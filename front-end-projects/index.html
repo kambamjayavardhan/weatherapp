@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather-App</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+          margin: 0;
+          overflow: hidden;
+          background-color: #171717;
+        }
+    
+        #magicContainer {
+          position: absolute;
+          top: 60%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          text-align: center;
+        }
+    
+        .magicText {
+          font-size: 24px;
+          font-weight: bold;
+          color: #fff;
+          text-transform: uppercase;
+          opacity: 0;
+          transform: translateY(20px);
+          transition: opacity 1s, transform 1s;
+        }
+    
+        .magicText:nth-child(2n) {
+          animation: fadeInOut 4s infinite;
+        }
+    
+        .magicText:nth-child(2n+1) {
+          animation: slideInOut 4s infinite;
+        }
+    
+        @keyframes fadeInOut {
+          0%, 100% {
+            opacity: 0;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+    
+        @keyframes slideInOut {
+          0%, 100% {
+            transform: translateY(20px);
+          }
+          50% {
+            transform: translateY(0);
+          }
+        }
+      </style>
+      <style>
+        body {
+              margin: 0;
+              height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              overflow: hidden;
+        
+        }
+        .container {
+            font-size: 10px;
+            width: 40em;
+            height: 40em;
+            position: relative;
+        
+        }
+        .sun {
+             position:absolute;
+             top: 15em;
+             left:15em;
+             width: 10em;
+             height: 10em;
+             background-color: yellow;
+             border-radius: 50%;
+             box-shadow: 0 0 3em 
+                 white;
+        
+        }
+        .earth,.moon{
+            position: absolute;
+            border-style: solid;
+            border-color: white
+            transparent
+            transparent
+            transparent;
+            border-width: 0.1em 0.1em 0 0 ;
+            border-radius: 50%;
+        
+        }
+        .earth{
+            top: 5em;
+            left: 5em;
+            width: 30em;
+            height: 30em;
+            animation: orbit 36.5s
+            linear infinite;
+        
+        }
+        .moon{
+            top: 0;
+            right: 0;
+            width: 8em;
+            height: 8em;
+            animation: orbit 2.7s
+            linear infinite;
+        }
+        .earth::before,
+        .moon::before {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+        
+        }
+        .earth::before {
+            top: 2.8em;
+            right: 2.8em;
+            width: 3em;
+            height: 3em;
+            background-color: rgb(16, 134, 212);
+        
+        }
+        .moon::before {
+            top: 0.8em;
+            right: 0.2em;
+            width: 1.2em;
+            height: 1.2em;
+            background-color: silver;
+            
+        }
+        @keyframes orbit {
+            to{
+                transform: rotate(360deg);
+            }
+        }
+        
+        </style>
+</head>
+<body>
+    <div id="magicContainer">
+        <div class="magicText">Abracadabra</div>
+    <div class="magicText">welcome to weather app</div>
+    <div class="card">
+        <div class="search">
+            <input type="text" placeholder="Enter City Name"
+            spellcheck="false">
+            <button><img src="images/search.png"></button>
+        </div>
+        <div class="error">
+            <p>Invalid City Name</p>
+        </div>
+        <div class="weather">
+            <img src="images/rain.png" class="weather-icon">
+            <h1 class="temp">22°c</h1>
+            <h2 class="city">New York</h2>
+            <div class="details">
+                <div class="col">
+                    <img src="images/humidity.png" >
+                    <div>
+                        <p class="humidity">50%</p>
+                        <p>Humidity</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <img src="images/wind.png" >
+                    <div>
+                        <p class="wind">15 km/h</p>
+                        <p>Wind Speed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const apiKey = "d7c293d804bbea64ea3796240e72adf5";
+    const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q=";
+
+    const searchBox = document.querySelector(".search input");
+    const searchBtn = document.querySelector(".search button");
+    const weatherIcon =  document.querySelector(".weather-icon");
+
+    async function checkWeather(city){
+        const response = await fetch(apiUrl + city + `&appid=${apiKey}`);
+
+        if(response.status == 404){
+            document.querySelector(".error").style.display = "block";
+            document.querySelector(".weather").style.display = "none";
+        }else{
+            var data = await response.json();
+
+document.querySelector(".city").innerHTML = data.name;
+document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°c";
+document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
+document.querySelector(".wind").innerHTML = data.wind.speed + "km/h";
+
+if(data.weather[0].main == "Clouds"){
+    weatherIcon.src = "images/clouds.png";
+}
+else if(data.weather[0].main == "Clear"){
+    weatherIcon.src = "images/clear.png";
+}
+else if(data.weather[0].main == "Rain"){
+    weatherIcon.src = "images/rain.png";
+}
+    else if(data.weather[0].main == "Drizzle"){
+    weatherIcon.src = "images/drizzle.png";
+}
+else if(data.weather[0].main == "Mist"){
+    weatherIcon.src = "images/mist.png";
+}
+document.querySelector(".weather").style.display = "block";
+
+
+        }
+       
+    }
+    searchBtn.addEventListener("click", ()=>{
+        checkWeather(searchBox.value);
+    })
+    </script>
+    </body>
+    <body1>
+    <div class="container">
+        <div class="sun"></div>
+        <div class="earth">
+        <div class="moon"></div>
+        
+        </div>
+    </div>
+    </body1>
+
+</html>
